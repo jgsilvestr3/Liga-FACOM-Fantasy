@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "coleta": "node carga/coletar.js",
+    "carga": "node carga/carregar.js"
   },
   "repository": {
     "type": "git",
