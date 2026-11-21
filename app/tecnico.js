@@ -33,10 +33,6 @@ async function menu(tecnicoId) {
 }
 
 async function mercado(rodada) {
-  if (!rodada) {
-    console.log('  O mercado só abre quando o administrador abre uma rodada.');
-    return;
-  }
   console.log('Filtros (Enter para ignorar)');
   const posicao = await tela.perguntaOpcional('Posição (gol, lat, zag, mei, ata, tec): ');
   const clube = await tela.perguntaOpcional('Clube (sigla, ex.: FLA): ');
@@ -54,7 +50,7 @@ async function mercado(rodada) {
     [posicao, clube, precoMax]));
   if (!atletas) return;
 
-  console.log(`\nMercado da rodada ${rodada} (até 30 atletas, maior média primeiro)`);
+  console.log(`\nMercado${rodada ? ` da rodada ${rodada}` : ' (nenhuma rodada aberta)'} (até 30 atletas, maior média primeiro)`);
   tela.tabela(atletas, [
     ['ID', (a) => a.atleta_id, 'dir'],
     ['Atleta', (a) => a.apelido],
@@ -145,10 +141,9 @@ async function completar(tecnicoId, rodada) {
      SELECT $1, $2, x.atleta_id
        FROM (SELECT m.atleta_id, m.posicao_id,
                     row_number() OVER (PARTITION BY m.posicao_id
-                                       ORDER BY m.media DESC NULLS LAST, random()) AS n
+                                 ORDER BY coalesce(m.media, 0) / m.preco DESC, m.preco) AS n
                FROM vw_mercado m
-              WHERE m.preco <= CASE WHEN m.posicao = 'tec' THEN 12 ELSE 7 END
-                AND NOT EXISTS (SELECT 1 FROM escalacao_atleta ea
+              WHERE NOT EXISTS (SELECT 1 FROM escalacao_atleta ea
                                  WHERE ea.tecnico_id = $1 AND ea.rodada = $2
                                    AND ea.atleta_id = m.atleta_id)) x
        JOIN escalacao e ON e.tecnico_id = $1 AND e.rodada = $2
@@ -163,10 +158,8 @@ async function completar(tecnicoId, rodada) {
 }
 
 async function escalacao(t, rodada) {
-  if (!rodada) {
-    console.log('  Nenhuma rodada aberta, não dá para montar escalação agora.');
-    return;
-  }
+ rodada = await tela.perguntaNumero('Rodada da escalação', rodada);
+  if (rodada === null) return;
 
   while (true) {
     const e = await mostrarEscalacao(t.id, rodada);
