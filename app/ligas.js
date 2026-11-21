@@ -1,5 +1,5 @@
-// Ligas do tecnico: criar, entrar e ranking (itens 7a e 7c).
-// O codigo de convite nao e lido da tabela: so o dono ve, pela fn_codigo_convite.
+// Ligas: criar, entrar e ranking.
+// o codigo de convite so o dono ve, pela fn_codigo_convite
 
 const db = require('./db');
 const tela = require('./tela');
@@ -40,7 +40,7 @@ async function ranking() {
       ['Time', (l) => l.time],
       ['Pontos', (l) => tela.numero(l.pontuacao), 'dir'],
     ]);
-    if (linhas.length === 0) console.log('  (a rodada ainda não foi consolidada ou a liga não existe)');
+    if (linhas.length === 0) console.log('  (rodada ainda não consolidada ou liga não existe)');
   } else {
     const linhas = await tela.executar(null, () => db.consultar(
       `SELECT posicao, tecnico, time, pontuacao, rodadas_pontuadas
@@ -101,7 +101,7 @@ async function verCodigo(tecnicoId) {
 }
 
 async function menu(t) {
-  for (;;) {
+  while (true) {
     await minhasLigas(t.id);
     const op = await tela.menu('Ligas', [
       ['1', 'Ranking de uma liga'],

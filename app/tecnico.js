@@ -1,6 +1,6 @@
-// Menu do tecnico: mercado, escalacao e ligas (itens 7a, 7b e 7c).
-// A aplicacao nao confere orcamento, esquema, capitao, situacao do atleta
-// nem estado da rodada: so manda o pedido e mostra o que o banco responder.
+// Menu do tecnico: mercado, escalacao e ligas.
+// As regras (orcamento, esquema, capitao, situacao, rodada) ficam no banco,
+// aqui so manda o comando e mostra a resposta.
 
 const db = require('./db');
 const tela = require('./tela');
@@ -12,12 +12,13 @@ async function rodadaAberta() {
 }
 
 async function menu(tecnicoId) {
-  for (;;) {
+  while (true) {
     const t = await db.umaLinha(
       'SELECT id, apelido, nome_time, patrimonio FROM tecnico WHERE id = $1', [tecnicoId]);
     const rodada = await rodadaAberta();
     console.log(`\n${t.apelido} (${t.nome_time}) · patrimônio ${tela.cartoleta(t.patrimonio)} · ` +
                 (rodada ? `rodada ${rodada} aberta` : 'nenhuma rodada aberta'));
+
     const op = await tela.menu('Técnico', [
       ['1', 'Mercado'],
       ['2', 'Minha escalação'],
@@ -31,9 +32,6 @@ async function menu(tecnicoId) {
   }
 }
 
-// ---------------------------------------------------------------
-// Mercado (7b): filtros por posicao, clube e preco maximo
-// ---------------------------------------------------------------
 async function mercado(rodada) {
   if (!rodada) {
     console.log('  O mercado só abre quando o administrador abre uma rodada.');
@@ -70,9 +68,6 @@ async function mercado(rodada) {
   ]);
 }
 
-// ---------------------------------------------------------------
-// Escalacao (7b)
-// ---------------------------------------------------------------
 async function mostrarEscalacao(tecnicoId, rodada) {
   const e = await db.umaLinha(
     `SELECT e.status, e.capitao_id, s.nome AS esquema
@@ -83,6 +78,7 @@ async function mostrarEscalacao(tecnicoId, rodada) {
     return null;
   }
 
+  // quantos de cada posicao ja tem x quantos o esquema pede
   const composicao = await db.consultar(
     `SELECT p.abreviacao AS pos,
             fn_qtd_exigida(e.esquema_id, p.id) AS exigida,
@@ -125,11 +121,12 @@ async function mostrarEscalacao(tecnicoId, rodada) {
   return e;
 }
 
-async function escolherEsquema(tecnicoId, rodada, existe) {
+async function escolherEsquema(tecnicoId, rodada, jaTem) {
   const esquemas = await db.consultar('SELECT id, nome FROM esquema ORDER BY nome');
   console.log('  Esquemas: ' + esquemas.map((s) => `${s.id}=${s.nome}`).join('  '));
   const id = await tela.perguntaNumero('ID do esquema');
-  if (existe) {
+
+  if (jaTem) {
     await tela.executar('Esquema trocado.', () => db.consultar(
       'UPDATE escalacao SET esquema_id = $1 WHERE tecnico_id = $2 AND rodada = $3',
       [id, tecnicoId, rodada]));
@@ -140,9 +137,8 @@ async function escolherEsquema(tecnicoId, rodada, existe) {
   }
 }
 
-// Preenche as vagas que faltam com atletas baratos do mercado, num INSERT so.
-// So sugere: cada linha passa pelo gatilho 6c, e se o banco recusar uma,
-// o INSERT inteiro e desfeito.
+// completa as vagas com atletas baratos do mercado (pra agilizar no video).
+
 async function completar(tecnicoId, rodada) {
   const r = await tela.executar(null, () => db.consultar(
     `INSERT INTO escalacao_atleta (tecnico_id, rodada, atleta_id)
@@ -168,10 +164,11 @@ async function completar(tecnicoId, rodada) {
 
 async function escalacao(t, rodada) {
   if (!rodada) {
-    console.log('  Nenhuma rodada aberta: não dá para montar escalação agora.');
+    console.log('  Nenhuma rodada aberta, não dá para montar escalação agora.');
     return;
   }
-  for (;;) {
+
+  while (true) {
     const e = await mostrarEscalacao(t.id, rodada);
     const op = await tela.menu('Escalação', [
       ['1', e ? 'Trocar esquema' : 'Escolher esquema (cria a escalação)'],

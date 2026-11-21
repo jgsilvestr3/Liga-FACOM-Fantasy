@@ -1,5 +1,5 @@
-// Menu do administrador (item 7d): abrir rodada, fechar mercado e consolidar.
-// Quem confere a ordem dos estados e as outras regras sao as procedures do 03.
+// Menu do administrador: abrir rodada, fechar mercado e consolidar.
+// quem confere a ordem dos estados sao as procedures do 03
 
 const db = require('./db');
 const tela = require('./tela');
@@ -10,23 +10,25 @@ async function situacao() {
             (SELECT numero FROM rodada WHERE estado = 'fechada')          AS fechada,
             (SELECT max(numero) FROM rodada WHERE estado = 'consolidada') AS ultima_consolidada,
             (SELECT min(numero) FROM rodada WHERE estado = 'futura')      AS proxima`);
-  console.log('\nRodadas: ' + [
-    r.aberta ? `rodada ${r.aberta} aberta` : null,
-    r.fechada ? `rodada ${r.fechada} fechada (esperando consolidação)` : null,
-    r.ultima_consolidada ? `última consolidada: ${r.ultima_consolidada}` : 'nenhuma consolidada',
-    r.proxima ? `próxima futura: ${r.proxima}` : null,
-  ].filter(Boolean).join(' · '));
+
+  const partes = [];
+  if (r.aberta) partes.push(`rodada ${r.aberta} aberta`);
+  if (r.fechada) partes.push(`rodada ${r.fechada} fechada (falta consolidar)`);
+  partes.push(r.ultima_consolidada ? `última consolidada: ${r.ultima_consolidada}` : 'nenhuma consolidada');
+  if (r.proxima) partes.push(`próxima: ${r.proxima}`);
+  console.log('\nRodadas: ' + partes.join(' · '));
   return r;
 }
 
-// o que a consolidacao mexe, para mostrar antes e depois
+// o que a consolidacao altera, pra comparar antes e depois da falha
 async function retrato(rodada) {
   return db.umaLinha(
-    `SELECT (SELECT estado FROM rodada WHERE numero = $1)                        AS estado,
-            (SELECT count(*) FROM historico_preco WHERE rodada = $1)              AS historico,
-            (SELECT count(*) FROM escalacao WHERE rodada = $1 AND pontuacao IS NOT NULL) AS pontuadas,
-            (SELECT sum(preco_atual) FROM atleta)                                 AS precos,
-            (SELECT sum(patrimonio) FROM tecnico)                                 AS patrimonios`, [rodada]);
+    `SELECT (SELECT estado FROM rodada WHERE numero = $1)           AS estado,
+            (SELECT count(*) FROM historico_preco WHERE rodada = $1) AS historico,
+            (SELECT count(*) FROM escalacao
+              WHERE rodada = $1 AND pontuacao IS NOT NULL)          AS pontuadas,
+            (SELECT sum(preco_atual) FROM atleta)                    AS precos,
+            (SELECT sum(patrimonio) FROM tecnico)                    AS patrimonios`, [rodada]);
 }
 
 async function resultado(rodada) {
@@ -51,6 +53,7 @@ async function resultado(rodada) {
 
 async function consolidar(padrao, simularFalha) {
   const rodada = await tela.perguntaNumero('Rodada para consolidar', padrao);
+
   if (!simularFalha) {
     const ok = await tela.executar(null, () => db.consultar(
       'CALL sp_consolidar_rodada($1, false)', [rodada]));
@@ -61,6 +64,7 @@ async function consolidar(padrao, simularFalha) {
   const antes = await retrato(rodada);
   await tela.executar(null, () => db.consultar('CALL sp_consolidar_rodada($1, true)', [rodada]));
   const depois = await retrato(rodada);
+
   console.log(`\nAntes e depois da tentativa (rodada ${rodada}):`);
   tela.tabela([
     ['estado da rodada', antes.estado, depois.estado],
@@ -69,23 +73,24 @@ async function consolidar(padrao, simularFalha) {
     ['soma dos preços dos atletas', tela.cartoleta(antes.precos), tela.cartoleta(depois.precos)],
     ['soma dos patrimônios', tela.cartoleta(antes.patrimonios), tela.cartoleta(depois.patrimonios)],
   ], [
-    ['O que a consolidação mexe', (l) => l[0]],
+    ['', (l) => l[0]],
     ['Antes', (l) => l[1], 'dir'],
-    ['Depois da falha', (l) => l[2], 'dir'],
+    ['Depois', (l) => l[2], 'dir'],
   ]);
 }
 
 async function menu() {
-  for (;;) {
+  while (true) {
     const s = await situacao();
     const op = await tela.menu('Administrador', [
       ['1', 'Abrir rodada'],
       ['2', 'Fechar mercado'],
       ['3', 'Consolidar rodada'],
-      ['4', 'Consolidar com falha simulada (para mostrar que nada muda)'],
+      ['4', 'Consolidar com falha simulada'],
       ['5', 'Ver resultado de uma rodada'],
       ['0', 'Voltar'],
     ]);
+
     if (op === '1') {
       const rodada = await tela.perguntaNumero('Rodada para abrir', s.proxima);
       await tela.executar(null, () => db.consultar('CALL sp_abrir_rodada($1)', [rodada]));

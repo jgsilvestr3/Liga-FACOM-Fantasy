@@ -1,5 +1,4 @@
-// Liga FACOM Fantasy - aplicacao de terminal (item 7)
-// Uso: npm run app
+// Liga FACOM Fantasy - npm run app
 
 const db = require('./db');
 const tela = require('./tela');
@@ -17,6 +16,7 @@ async function escolherTecnico() {
     ['Time', (t) => t.nome_time],
     ['Patrimônio', (t) => tela.cartoleta(t.patrimonio), 'dir'],
   ]);
+
   const id = await tela.perguntaNumero('ID do técnico');
   const t = await db.umaLinha('SELECT id FROM tecnico WHERE id = $1', [id]);
   if (!t) {
@@ -32,13 +32,14 @@ async function cadastrarTecnico() {
   const email = await tela.pergunta('E-mail: ');
   const apelido = await tela.pergunta('Apelido: ');
   const time = await tela.pergunta('Nome do time: ');
+
   const r = await tela.executar(null, () => db.umaLinha(
     `INSERT INTO tecnico (nome, email, apelido, nome_time)
      VALUES ($1, $2, $3, $4)
      RETURNING id, apelido, patrimonio`,
     [nome, email, apelido, time]));
   if (r) {
-    console.log(`  OK: ${r.apelido} cadastrado com o id ${r.id} e patrimônio de ${tela.cartoleta(r.patrimonio)}.`);
+    console.log(`  OK: ${r.apelido} cadastrado com id ${r.id} e patrimônio de ${tela.cartoleta(r.patrimonio)}.`);
   }
 }
 
@@ -50,7 +51,7 @@ async function main() {
     process.exit(1);
   }
 
-  for (;;) {
+  while (true) {
     const op = await tela.menu('Liga FACOM Fantasy', [
       ['1', 'Entrar como técnico'],
       ['2', 'Cadastrar técnico'],
@@ -62,6 +63,7 @@ async function main() {
     else if (op === '3') await admin.menu();
     else if (op === '0') break;
   }
+
   await db.desconectar();
   console.log('Até mais!');
 }

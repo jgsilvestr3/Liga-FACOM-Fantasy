@@ -1,9 +1,7 @@
-// Entrada e saida no terminal. So exibicao, nenhuma regra do jogo aqui.
-
 const readline = require('readline');
 const db = require('./db');
 
-// fila de linhas digitadas (funciona tambem com entrada redirecionada)
+// le as linhas numa fila (assim funciona tambem com entrada vinda de arquivo)
 const rl = readline.createInterface({ input: process.stdin });
 const linhas = [];
 let esperando = null;
@@ -29,16 +27,17 @@ async function pergunta(texto) {
   if (linhas.length > 0) resp = linhas.shift();
   else if (fechou) resp = null;
   else resp = await new Promise((r) => { esperando = r; });
+
   if (resp === null) {
     console.log('\nAté mais!');
     await db.desconectar();
     process.exit(0);
   }
-  if (!process.stdin.isTTY) console.log(resp); // mostra o que foi lido de arquivo
+  if (!process.stdin.isTTY) console.log(resp);
   return resp.trim();
 }
 
-// devolve null se a pessoa so apertar Enter
+// Enter vazio = null
 async function perguntaOpcional(texto) {
   const r = await pergunta(texto);
   return r === '' ? null : r;
@@ -67,22 +66,22 @@ function numero(v) {
   return Number(v).toFixed(2).replace('.', ',');
 }
 
-// colunas: [[titulo, funcao que pega o valor da linha, 'dir' para alinhar a direita]]
-function tabela(linhasTabela, colunas) {
-  if (linhasTabela.length === 0) {
+// colunas = [titulo, funcao que devolve o valor, 'dir' se alinha a direita]
+function tabela(dados, colunas) {
+  if (dados.length === 0) {
     console.log('  (nada para mostrar)');
     return;
   }
-  const textos = linhasTabela.map((l) => colunas.map(([, f]) => String(f(l) ?? '-')));
+  const textos = dados.map((l) => colunas.map(([, f]) => String(f(l) ?? '-')));
   const larg = colunas.map(([t], i) => Math.max(t.length, ...textos.map((l) => l[i].length)));
-  const alinhar = (s, i) => (colunas[i][2] === 'dir' ? s.padStart(larg[i]) : s.padEnd(larg[i]));
-  console.log('  ' + colunas.map(([t], i) => alinhar(t, i)).join('  '));
+  const alinha = (s, i) => (colunas[i][2] === 'dir' ? s.padStart(larg[i]) : s.padEnd(larg[i]));
+
+  console.log('  ' + colunas.map(([t], i) => alinha(t, i)).join('  '));
   console.log('  ' + larg.map((n) => '-'.repeat(n)).join('  '));
-  for (const l of textos) console.log('  ' + l.map(alinhar).join('  '));
+  for (const l of textos) console.log('  ' + l.map(alinha).join('  '));
 }
 
-// Executa uma operacao no banco e mostra o resultado.
-// Se o banco recusar, mostra a mensagem dele e devolve null.
+// roda a operacao no banco; se der erro mostra a mensagem e devolve null
 async function executar(msgOk, operacao) {
   try {
     const r = await operacao();
