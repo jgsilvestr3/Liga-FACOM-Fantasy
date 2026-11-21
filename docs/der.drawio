@@ -691,12 +691,6 @@
         <mxCell id="c99" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1f2937;fontSize=11;fontFamily=Arial;" value="quantidade" vertex="1">
           <mxGeometry height="28" width="84" x="2217" y="732" as="geometry" />
         </mxCell>
-        <mxCell id="c231" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;fontFamily=Arial;" value="Liga FACOM Fantasy · Diagrama ER" vertex="1">
-          <mxGeometry height="34" width="700" x="1765" y="30" as="geometry" />
-        </mxCell>
-        <mxCell id="c232" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontFamily=Arial;fontColor=#374151;" value="Notação de Peter Chen (Elmasri &amp; Navathe): razão de cardinalidade e participação" vertex="1">
-          <mxGeometry height="22" width="700" x="1765" y="74" as="geometry" />
-        </mxCell>
         <mxCell id="c233" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fontColor=#000000;fontFamily=Arial;" value="N" vertex="1">
           <mxGeometry height="22" width="26" x="471" y="116" as="geometry" />
         </mxCell>
@@ -819,6 +813,24 @@
         </mxCell>
         <mxCell id="c273" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;fontColor=#000000;fontFamily=Arial;" value="1" vertex="1">
           <mxGeometry height="22" width="26" x="1595" y="1307" as="geometry" />
+        </mxCell>
+        <mxCell id="c274" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1f2937;fontSize=11;fontFamily=Arial;" value="data_entrada" vertex="1">
+          <mxGeometry height="28" width="96" x="402" y="318" as="geometry" />
+        </mxCell>
+        <mxCell id="c275" edge="1" parent="1" source="c16" style="endArrow=none;html=1;strokeColor=#4b5563;strokeWidth=1;" target="c274">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c276" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1f2937;fontSize=11;fontFamily=Arial;" value="preco_rodada" vertex="1">
+          <mxGeometry height="28" width="98" x="950" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="c277" edge="1" parent="1" source="c22" style="endArrow=none;html=1;strokeColor=#4b5563;strokeWidth=1;" target="c276">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c278" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1f2937;fontSize=11;fontFamily=Arial;" value="preco_novo" vertex="1">
+          <mxGeometry height="28" width="88" x="962" y="812" as="geometry" />
+        </mxCell>
+        <mxCell id="c279" edge="1" parent="1" source="c22" style="endArrow=none;html=1;strokeColor=#4b5563;strokeWidth=1;" target="c278">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
