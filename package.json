@@ -1,0 +1,27 @@
+{
+  "name": "liga-facom-fantasy",
+  "version": "1.0.0",
+  "description": "Trabalho Prático da matéria Laboratório de Banco de Dados",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgsilvestr3/Liga-FACOM-Fantasy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jgsilvestr3/Liga-FACOM-Fantasy/issues"
+  },
+  "homepage": "https://github.com/jgsilvestr3/Liga-FACOM-Fantasy#readme",
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}
