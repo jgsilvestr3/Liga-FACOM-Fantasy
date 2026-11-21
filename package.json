@@ -8,7 +8,8 @@
   },
   "scripts": {
     "coleta": "node carga/coletar.js",
-    "carga": "node carga/carregar.js"
+    "carga": "node carga/carregar.js",
+    "app": "node app/index.js"
   },
   "repository": {
     "type": "git",
