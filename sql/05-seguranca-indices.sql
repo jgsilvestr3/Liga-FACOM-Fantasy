@@ -33,9 +33,13 @@ GRANT USAGE ON SCHEMA fantasy TO liga_app, liga_carga;
 GRANT SELECT ON ALL TABLES IN SCHEMA fantasy TO liga_app;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA fantasy TO liga_app;
 
+-- codigo de convite so aparece pela fn_codigo_convite (so para o dono)
+REVOKE SELECT ON liga FROM liga_app;
+GRANT SELECT (id, dono_id, nome, descricao, limite_participantes, publica, criada_em) ON liga TO liga_app;
+
 -- patrimonio nao esta na lista, entra pelo default (100)
 GRANT INSERT (nome, email, apelido, nome_time) ON tecnico TO liga_app;
-GRANT INSERT (dono_id, nome, descricao, limite_participantes, publica) ON liga TO liga_app;
+-- liga se cria pela sp_criar_liga (o gatilho coloca o dono na participacao)
 
 -- status nao esta na lista: confirmar so pela procedure
 GRANT INSERT (tecnico_id, rodada, esquema_id) ON escalacao TO liga_app;
