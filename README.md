@@ -22,6 +22,7 @@ docs/     diagrama ER (der.png, der.drawio), mapeamento.md, decisoes.md e regras
 sql/      scripts do banco, rodar na ordem abaixo
 carga/    coletar.js (API -> json), carregar.js (json -> banco) e dados/ com os json coletados
 app/      aplicação de terminal
+testes/   testes-regras.sql (81 testes das regras) e simular-rodadas.js (joga rodadas completas)
 ```
 
 ## Requisitos
@@ -121,3 +122,24 @@ As rodadas começam no estado `futura`. Pela aplicação:
 4. Administrador → consolidar rodada (calcula pontuações, preços, patrimônio e ranking)
 
 Para voltar ao banco vazio, rode de novo os scripts 01 a 05 e a carga.
+
+## 5. Testes das regras
+
+Logo depois da carga (com a rodada 1 ainda futura). Roda tudo numa transação com ROLLBACK: o banco volta como estava.
+
+```
+docker cp testes liga-postgres:/
+docker exec liga-postgres psql -U postgres -d liga_fantasy -f /testes/testes-regras.sql
+```
+
+O resultado é uma tabela com cada regra testada e "ok" ou "FALHOU", e o total no fim.
+
+## 6. Ver as consultas com dados
+
+As rodadas reais são carregadas no estado `futura` e rejogadas na liga (decisões D14 e D17). Por isso, logo depois da carga, as consultas do 04 que dependem de rodadas consolidadas voltam vazias. Para vê-las com resultado, jogue algumas rodadas (o simulador usa os mesmos procedimentos da aplicação) e rode o 04 de novo, que pode ser executado quantas vezes quiser:
+
+```
+npm run simular -- 8
+docker exec liga-postgres psql -U postgres -d liga_fantasy -f /sql/04-consultas.sql
+```
+
