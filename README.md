@@ -9,7 +9,7 @@ Banco de dados e aplicação de terminal de uma liga de fantasy no estilo do Car
 |---|---|
 | Bruno Rodrigues |202519070487 |
 | João Gabriel | 202519070223|
-| Pedro Affonso Medalha | |
+| Pedro Affonso Medalha | 202519070240 |
 
 ## Vídeo
 
