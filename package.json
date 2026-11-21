@@ -9,7 +9,8 @@
   "scripts": {
     "coleta": "node carga/coletar.js",
     "carga": "node carga/carregar.js",
-    "app": "node app/index.js"
+    "app": "node app/index.js",
+    "simular": "node testes/simular-rodadas.js"
   },
   "repository": {
     "type": "git",
