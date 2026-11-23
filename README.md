@@ -14,7 +14,7 @@ Banco de dados e aplicação de terminal de uma liga de fantasy no estilo do Car
 ## Links para correção
 
 - Repositório: https://github.com/jgsilvestr3/Liga-FACOM-Fantasy
-- Vídeo: COLE_AQUI_O_LINK_DO_VIDEO
+- Vídeo: https://drive.google.com/drive/folders/1oUhnIAuHKYJj_tDcpcKwdduwOS4bTOdv?usp=sharing
 
 ## Estrutura
 
