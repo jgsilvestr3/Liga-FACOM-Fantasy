@@ -11,9 +11,10 @@ Banco de dados e aplicação de terminal de uma liga de fantasy no estilo do Car
 | João Gabriel | 202519070223|
 | Pedro Affonso Medalha | 202519070240 |
 
-## Vídeo
+## Links para correção
 
-Link: 
+- Repositório: https://github.com/jgsilvestr3/Liga-FACOM-Fantasy
+- Vídeo: COLE_AQUI_O_LINK_DO_VIDEO
 
 ## Estrutura
 
